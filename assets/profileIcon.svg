@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="28.5" height="28.5" viewBox="0 0 28.5 28.5">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Path_105" data-name="Path 105" d="M39.975,28.083A13.523,13.523,0,1,1,26.453,14.56,13.521,13.521,0,0,1,39.975,28.083Z" transform="translate(-12.93 -14.56)"/>
+    </clipPath>
+  </defs>
+  <g id="Profile_Icon" data-name="Profile Icon" transform="translate(-7.87 -9.5)">
+    <path id="Path_102" data-name="Path 102" d="M36.37,23.75A14.25,14.25,0,1,1,22.12,9.5,14.25,14.25,0,0,1,36.37,23.75Z" transform="translate(0)" fill="#c9cbc9"/>
+    <g id="Group_581" data-name="Group 581" transform="translate(8.597 10.227)">
+      <g id="Group_580" data-name="Group 580" transform="translate(0 0)" clip-path="url(#clip-path)">
+        <path id="Path_103" data-name="Path 103" d="M40.218,153.55H28.75a6.447,6.447,0,0,0-6.44,6.441v.624H46.66v-.624A6.449,6.449,0,0,0,40.218,153.55Z" transform="translate(-20.962 -133.57)" fill="#fff"/>
+        <path id="Path_104" data-name="Path 104" d="M71.371,68.386h0a5.983,5.983,0,1,0,0-11.966h0a5.983,5.983,0,0,0,0,11.966Z" transform="translate(-57.849 -50.403)" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="37.5" height="37.5" viewBox="9.241385459899902 6.241392612457275 19.008615493774414 19.008607864379883">
+  <defs>
+    <filter id="iconmonstr-search-thin" x="0" y="0" width="37.5" height="37.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"></feOffset>
+      <feGaussianBlur stdDeviation="3" result="blur"></feGaussianBlur>
+      <feFlood flood-opacity="0.278"></feFlood>
+      <feComposite operator="in" in2="blur"></feComposite>
+      <feComposite in="SourceGraphic"></feComposite>
+    </filter>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 0, 0)" filter="url(#iconmonstr-search-thin)">
+    <path id="iconmonstr-search-thin-2" data-name="iconmonstr-search-thin" d="M12.55,13.11a7.525,7.525,0,1,1,.56-.56L19,18.44l-.56.56-5.89-5.89ZM7.521.792A6.729,6.729,0,1,1,.792,7.521,6.733,6.733,0,0,1,7.521.792Z" transform="translate(9.25 6.25)" fill="rgba(0,0,0,0.44)" stroke="#6d6e70" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" fill-rule="evenodd"></path>
+  </g>
+</svg>
