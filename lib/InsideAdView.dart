@@ -14,14 +14,20 @@ class CommunityInsideAdView extends StatefulWidget {
 }
 
 class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
+  final Set<Marker> _markers = {};
 
-  GoogleMapController mapController;
-  final LatLng _center = const LatLng(33.6844, 73.0479);
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+ //GoogleMapController mapController;
+ //final LatLng _center = const LatLng(33.6844, 73.0479);
+ //void _onMapCreated(GoogleMapController controller) {
+ //  mapController = controller;
+  //}
   @override
   Widget build(BuildContext context) {
+    _markers.add(Marker(
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      markerId: MarkerId("markers"),
+      position: LatLng(25.276987, 55.296249),
+    ));
     return Scaffold(
      backgroundColor: Colors.white,
       bottomNavigationBar: InsideAdBottomBar(),
@@ -263,13 +269,20 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                   top: 0,
                   left: 17,
                   right: 17,
-                  child: GoogleMap(
-                    onMapCreated: _onMapCreated,
+                  height: 190,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(26),
+                        bottomRight: Radius.circular(26)),
+                    child: GoogleMap(
+                      markers: _markers,
+                      mapType: MapType.normal,
                       initialCameraPosition: CameraPosition(
-                        target: _center,
-                        zoom: 11.0,
+                        target: LatLng(25.276987, 55.296249),
+                        zoom: 6,
                       ),
-                    mapType: MapType.normal,
+                      onMapCreated: (GoogleMapController controller) {},
+                    ),
                   ),
                 ),
 
