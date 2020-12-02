@@ -4,17 +4,26 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:readmore/readmore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'insideAdViewBottomBar.dart';
-class CommunityInsideAdView extends StatefulWidget {
- // final String categoryName;
-  //final String subCategoryName;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:community_app/Controllers/communityAdList.dart';
+import 'package:get/get.dart';
 
-  // CommunityInsideAdView({ this.categoryName, this.subCategoryName});
+class CommunityInsideAdView extends StatefulWidget {
+  final int index;
+  CommunityInsideAdView(this.index);
+
   @override
   _CommunityInsideAdViewState createState() => _CommunityInsideAdViewState();
 }
 
 class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
   final Set<Marker> _markers = {};
+
+  final PageController _pageController =
+  PageController(viewportFraction: 0.9, initialPage: 0);
+  CommunityAdListController _communityAdListController = Get.find();
+  int currentAdImage = 0;
+  int totalImage = 6;
 
  //GoogleMapController mapController;
  //final LatLng _center = const LatLng(33.6844, 73.0479);
@@ -41,20 +50,37 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
               children: [
                 Positioned(
                   top: 0,
-                    left: 0,
-                    width: MediaQuery.of(context).size.width,
-                    child: Container(
-                      child: Image.asset(
-                          'assets/car1.png',
-                              height: 250,
-                      ),
+                  left: 0,
+                  height: 250,
+                  width: MediaQuery.of(context).size.width,
+                  child: Container(
+                    child: PageView.builder(
+                        scrollDirection: Axis.horizontal,
+                        onPageChanged: (value) {
+                          setState(() {
+                            currentAdImage = value;
+                          });
+                        },
+                        itemCount: _communityAdListController
+                            .allCommunityList[widget.index].Images.length,
+                        itemBuilder: (context, int index1) {
+                          return CachedNetworkImage(
+                              fit: BoxFit.fill,
+                              imageUrl:
+                              'https://firebasestorage.googleapis.com/v0/b/elistad-d9339.appspot.com/o/Services%2F' +
+                                  _communityAdListController
+                                      .allCommunityList[widget.index]
+                                      .Images[index1] +
+                                  '.jpg?alt=media');
+                        },
                     ),
+                  ),
                 ),
                 Positioned(
                   top: 21,
                   left: 17,
                   child: GestureDetector(
-                    onTap: (){},
+                    onTap: () => Get.back(),
                     child: SvgPicture.asset('assets/backButton.svg'),
                   ),
                 ),
@@ -71,6 +97,41 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                     ),
                 ),
                 Positioned(
+                    left: 24,
+                    top: 226,
+                    child: Text(
+                      (currentAdImage + 1).toString() +
+                          ' of ' +
+                          _communityAdListController
+                              .allCommunityList[widget.index].Images.length
+                              .toString(),
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    )),
+                Positioned(
+                    top: 231,
+                    width: MediaQuery.of(context).size.width,
+                    height: 7,
+                    child: Center(
+                      child: ListView.builder(
+                          primary: true,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _communityAdListController
+                              .allCommunityList[widget.index]
+                              .Images
+                              .length,
+                          itemBuilder: (context, int index) {
+                            return Container(
+                              width: 11,
+                              child: index == currentAdImage
+                                  ? SvgPicture.asset(
+                                  'assets/pageIndicatorFilled.svg')
+                                  : SvgPicture.asset(
+                                  'assets/pageIndicator.svg'),
+                            );
+                          }),
+                    )),
+                Positioned(
                     right: 64,
                     top: 230,
                     width: 30,
@@ -86,7 +147,9 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                   top: 260,
                   left: 17,
                   child: Text(
-                    'Photo AND Video Services',
+                    _communityAdListController
+                        .allCommunityList[widget.index].Title,
+                  //  'Photo AND Video Services',
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontFamily: 'Roboto',
@@ -96,12 +159,13 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                 Positioned(
                   top: 289 ,
                   left: 17,
+                  width: MediaQuery.of(context).size.width,
                   child: Text(
                     'Events  >  Photo',
                     style: TextStyle(
                         color: Color(0xFF6D6E70),
                         fontFamily: 'Roboto',
-                        fontSize: 10),
+                        fontSize: 14),
                   ),
                 ),
 
@@ -116,9 +180,20 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                         SvgPicture.asset('assets/daysIcon.svg'),
                         SizedBox(width: 5.6),
                         Text(
-                          '5 days ago',
+                          ((DateTime.now().millisecondsSinceEpoch -
+                              _communityAdListController
+                                  .allCommunityList[
+                              widget.index]
+                                  .PostedOn
+                                  .millisecondsSinceEpoch) /
+                              (1000 * 86400))
+                              .floor()
+                              .toString() +
+                              ' days ago',
                           style: TextStyle(
-                              fontSize: 10, color: Color(0xFF6D6E70)),
+                              fontFamily: 'Roboto-Regular',
+                              fontSize: 10,
+                              color: Color(0xFF6D6E70)),
                         )
                       ],
                     )),
@@ -252,7 +327,8 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
                   style: TextStyle(color: Color(0xFF6D6E70), fontSize: 16),
                 ),
                 Text(
-                  'UAE -  Abu Dhabi - City Center',
+                  _communityAdListController
+                      .allCommunityList[widget.index].Location,
                   style: TextStyle(color: Color(0xFF6D6E70), fontSize: 14),
                 ),
               ],
@@ -330,238 +406,109 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
           ),
           SizedBox(height: 13),
           Container(
-            height: 348,
             width: MediaQuery.of(context).size.width,
-            child: Stack(
-              children: [
-                Positioned(
-                    top: 0.0,
-                    height: 195,
-                    left: 15,
-                    right: 15,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(18),
-                              topRight: Radius.circular(18))),
-                      child: PageView.builder(
-                          scrollDirection: Axis.horizontal,
-                          onPageChanged: (value) {},
-                          itemCount: 1,
-                          itemBuilder: (context, int index) {
-                            return Image.asset('assets/car.png');
-                          }),
-                    )),
-                Positioned(
-                    top: 10,
-                    width: 25,
-                    height: 25,
-                    right: 27,
-                    child: SvgPicture.asset('assets/favoritesIcon.svg')),
-                Positioned(
-                    left: 24,
-                    top: 172,
-                    child: Text(
-                      1.toString() + ' of ' + 1.toString(),
-                      style: TextStyle(color: Colors.white, fontSize: 8),
-                    )),
-                Positioned(
-                    top: 172,
-                    width: MediaQuery.of(context).size.width,
-                    height: 7,
-                    child: Center(
-                      child: ListView.builder(
-                          primary: true,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 1,
-                          itemBuilder: (context, int index) {
-                            return Container(
-                              width: 11,
-                              child: 1 - 1 == index
-                                  ? SvgPicture.asset(
-                                  'assets/pageIndicatorFilled.svg')
-                                  : SvgPicture.asset(
-                                  'assets/pageIndicator.svg'),
-                            );
-                          }),
-                    )),
-                Positioned(
-                    top: 203.5,
-                    height: 19,
-                    left: 15,
-                    width: 80,
-                    child: Text('AED 500,000',
-                        style: TextStyle(
-                            color: Color(0xFF1877F2),
-                            fontSize: 14,
-                            fontFamily: 'Roboto'))),
-                Positioned(
-                    top: 206.5,
-                    right: 15,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+            margin: EdgeInsets.only(left: 17),
+            height: 348,
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 8,
+                itemBuilder: (context, int index) {
+                  return Container(
+                    width: 308,
+                    height: 289.78,
+                    margin: EdgeInsets.only(right: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SvgPicture.asset('assets/daysIcon.svg'),
-                        SizedBox(width: 5.6),
+                        FittedBox(
+                          fit: BoxFit.cover,
+                          child: Container(
+                              width: 308,
+                              height: 175,
+                              child: Image.asset('assets/car.png')),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text('AED 500,000',
+                            style: TextStyle(
+                                color: Color(0xFF1877F2),
+                                fontSize: 14,
+                                fontFamily: 'Roboto-Medium')),
+                        SizedBox(
+                          height: 6,
+                        ),
+                        Text('New Televisions for All',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Roboto-Regular',
+                                color: Color(0xFF6D6E70))),
+                        SizedBox(
+                          height: 7,
+                        ),
                         Text(
-                          '5 days ago',
+                          'Electronics' + ' · ' + 'Televisions',
                           style: TextStyle(
-                              fontSize: 10, color: Color(0xFF6D6E70)),
-                        )
-                      ],
-                    )),
-                Positioned(
-                    top: 225.5,
-                    left: 15,
-                    child: Text(
-                      'New Services in the town',
-                      style: TextStyle(
-                          fontFamily: 'Roboto', color: Colors.black),
-                    )),
-                Positioned(
-                    top: 247.5,
-                    left: 15,
-                    child: Text(
-                      'Wedding' + ' · ' + 'Florists',
-                      style: TextStyle(color: Color(0xFF6D6E70)),
-                    )),
-                // Positioned(
-                //     left: 15,
-                //     top: 270.5,
-                //     child: Text(
-                //       'Top Ad',
-                //       style:
-                //           TextStyle(color: Color(0xFF6D6E70), fontSize: 12),
-                //     )),
-                Positioned(
-                    top: 280.5,
-                    height: 13,
-                    left: 15,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset('assets/locationIcon.svg'),
-                        SizedBox(width: 3.71),
-                        Text(
-                          'City Center',
-                          style: TextStyle(
-                              fontSize: 10, color: Color(0xFF6D6E70)),
-                        )
-                      ],
-                    )),
-                Positioned(
-                    top: 302,
-                    left: 15,
-                    right: 15,
-                    height: 0.2,
-                    child: Container(
-                      color: Color(0xFF6D6E70),
-                    )),
-                Positioned(
-                    top: 309.5,
-                    left: 15,
-                    child: Container(
-                      height: 0.2,
-                      color: Color(0xFF6D6E70),
-                    )),
-                Positioned(
-                    top: 309.5,
-                    left: 33,
-                    right: 33,
-                    height: 28.5,
-                    child: Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SvgPicture.asset('assets/profileIcon.svg'),
-                          Row(
+                              fontFamily: 'Roboto-Regular',
+                              color: Color(0xFF6D6E70),
+                              fontSize: 10),
+                        ),
+                        SizedBox(
+                          height: 11,
+                        ),
+                        Container(
+                          width: 308,
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
-                                alignment: Alignment.center,
-                                width: 79,
-                                height: 24,
-                                child: Row(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/callIcon.svg',
-                                    ),
-                                    SizedBox(
-                                      width: 4,
-                                    ),
-                                    Text(
-                                      'Call',
-                                      style: TextStyle(
-                                          color: Color(0xFF1877F2),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        width: 1,
-                                        color: Color(0xFF1877F2))),
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                      'assets/locationIcon.svg'),
+                                  SizedBox(width: 3.71),
+                                  Text(
+                                    'City Center',
+                                    style: TextStyle(
+                                        fontFamily: 'Roboto-Regular',
+                                        fontSize: 10,
+                                        color: Color(0xFF6D6E70)),
+                                  ),
+                                ],
                               ),
-                              SizedBox(width: 10),
-                              Container(
-                                alignment: Alignment.center,
-                                width: 79,
-                                height: 24,
-                                child: Row(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/ChatsIconFilled.svg',
-                                      height: 12.83,
-                                      width: 14,
-                                    ),
-                                    SizedBox(
-                                      width: 4,
-                                    ),
-                                    Text(
-                                      'Chat',
-                                      style: TextStyle(
-                                          color: Color(0xFF1877F2),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        width: 1,
-                                        color: Color(0xFF1877F2))),
-                              ),
+                              Row(
+                                children: [
+                                  SvgPicture.asset('assets/daysIcon.svg'),
+                                  SizedBox(width: 3.71),
+                                  Text(
+                                    '5 days ago',
+                                    style: TextStyle(
+                                        fontFamily: 'Roboto-Regular',
+                                        fontSize: 10,
+                                        color: Color(0xFF6D6E70)),
+                                  ),
+                                ],
+                              )
                             ],
-                          )
-                        ],
-                      ),
-                    )),
-                SizedBox(height: 9.5),
-                Positioned(
-                    top: 343,
-                    height: 5,
-                    width: MediaQuery.of(context).size.width,
-                    child: Container(
-                      color: Color(0xFFECECEC),
-                    )),
-              ],
-            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
           ),
-          SizedBox(height: 17.5),
-          //Safety Tips
+          Container(
+            width: double.infinity,
+            height: 5,
+            color: Color(0xFFECECEC),
+          ),
+          SizedBox(
+            height: 17,
+          ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 17),
             child: Row(
@@ -581,26 +528,84 @@ class _CommunityInsideAdViewState extends State<CommunityInsideAdView> {
             ),
           ),
           Container(
-              margin: EdgeInsets.symmetric(horizontal: 25),
-              alignment: Alignment.centerLeft,
-              child: Text('• Never transfer money in advance')),
-          Container(
-              margin: EdgeInsets.symmetric(horizontal: 25),
-              alignment: Alignment.centerLeft,
-              child: Text('• Meet the seller at a public place.')),
-          Container(
-              margin: EdgeInsets.symmetric(horizontal: 25),
-              alignment: Alignment.centerLeft,
-              child: Text('• Avoid items with unrealistic prices.')),
-          Container(
-              margin: EdgeInsets.symmetric(horizontal: 25),
-              alignment: Alignment.centerLeft,
-              child: Text("• Don't proceed if something seems wrong"))
+            height: 76,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                    margin: EdgeInsets.symmetric(horizontal: 17),
+                    alignment: Alignment.centerLeft,
+                    child: Text('• Never transfer money in advance')),
+                Container(
+                    margin: EdgeInsets.symmetric(horizontal: 17),
+                    alignment: Alignment.centerLeft,
+                    child: Text('• Meet the seller at a public place.')),
+                Container(
+                    margin: EdgeInsets.symmetric(horizontal: 17),
+                    alignment: Alignment.centerLeft,
+                    child: Text('• Avoid items with unrealistic prices.')),
+                Container(
+                    margin: EdgeInsets.symmetric(horizontal: 17),
+                    alignment: Alignment.centerLeft,
+                    child:
+                    Text("• Don't proceed if something seems wrong")),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 68.5,
+          ),
         ],
       ),
       ),
       ),
-
+      bottomSheet: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Color(0xFFECECEC)))),
+        height: 60.0,
+        alignment: Alignment.center,
+        child: Container(
+          width: 333,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 35,
+                width: 150,
+                child: RaisedButton(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  onPressed: () {},
+                  child: Text(
+                    'Chat',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  color: Color(0xFF1877F2),
+                ),
+              ),
+              Container(
+                height: 35,
+                width: 150,
+                child: RaisedButton(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  onPressed: () {},
+                  child: Text(
+                    'Call',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  color: Color(0xFF1877F2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
