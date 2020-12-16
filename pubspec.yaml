@@ -32,6 +32,9 @@ dependencies:
   readmore: ^1.0.0
   google_maps_flutter: ^1.0.6
   cached_network_image: ^2.3.3
+  image_picker: ^0.6.7+15
+  video_player: ^1.0.1 
+  dotted_border: ^1.0.7
 
 
 
